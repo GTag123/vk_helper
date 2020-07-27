@@ -9,8 +9,11 @@ $confirmation_token = $config['confirmation_token'];
 $token = $config['token'];
 $secret = $config['secret'];
 
-$log = date('Y-m-d H:i:s') . ' new request: ' . file_get_contents('php://input');
-file_put_contents(__DIR__ . '/log.txt', $log . PHP_EOL, FILE_APPEND);
+function logging($text) {
+    file_put_contents(__DIR__ . '/../log.txt', date('Y-m-d H:i:s') . ' ' . $text . PHP_EOL, FILE_APPEND);
+}
+
+logging('new request: ' . file_get_contents('php://input'));
 
 $data = json_decode(file_get_contents('php://input'));
 switch ($data->type) {
@@ -38,7 +41,7 @@ switch ($data->type) {
                             'v' => '5.120'
                         );
                     $query = file_get_contents('https://api.vk.com/method/messages.removeChatUser?'. http_build_query($request_params));
-                    file_put_contents(__DIR__ . '/log.txt', date('Y-m-d H:i:s') . ' kick user: '. $query . PHP_EOL, FILE_APPEND);
+                    logging('kick user: '. $query);
                     break;
                 case 'chat_invite_user':
                     if ($member > 0){
@@ -51,7 +54,7 @@ switch ($data->type) {
                                 'random_id' => rand()
                             );
                         $query = file_get_contents('https://api.vk.com/method/messages.send?'. http_build_query($request_params));
-                        file_put_contents(__DIR__ . '/log.txt', date('Y-m-d H:i:s') . ' add user: '. $query . PHP_EOL, FILE_APPEND);
+                        logging('add user: '. $query);
                     }
                     break;
             }
@@ -91,7 +94,7 @@ switch ($data->type) {
                             'v' => '5.120'
                         );
                         $query = file_get_contents('https://api.vk.com/method/messages.removeChatUser?'. http_build_query($kick_params));
-                        file_put_contents(__DIR__ . '/log.txt', date('Y-m-d H:i:s') . ' kick user: '. $query . PHP_EOL, FILE_APPEND);
+                        logging('kick user: '. $query);
                         $json_query = json_decode($query);
                         if (isset($json_query->response)){
                             $user = $daun_id > 0 ? "[id{$daun_id}|{$daun_id}]" : "[club". abs($daun_id) . "|{$daun_id}]";
